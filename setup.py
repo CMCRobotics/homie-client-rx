@@ -2,15 +2,14 @@ from setuptools import setup
 
 
 setup(
-    name='homieclient',
+    name='homie-client-x',
     version='0.0.1',
     package_dir={'': 'src'},
     packages=['homieclient',],
     license='MIT License',
-    author='Michel Wilson',
-    author_email='michel@crondor.net',
-    url='https://github.com/michelwilson/homieclient',
-    description='Client to interact with Homie IoT devices via MQTT',
+    author='Brice Copy',
+    url='https://github.com/cmcrobotics/homie-client-rx',
+    description='Reactive lient to interact with Homie IoT devices via MQTT',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     python_requires='>=3.0',
