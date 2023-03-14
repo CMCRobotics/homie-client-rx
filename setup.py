@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(
-    name='homie-client-x',
+    name='homie-client-rx',
     version='0.0.1',
     package_dir={'': 'src'},
     packages=['homieclient',],
