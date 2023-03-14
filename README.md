@@ -4,11 +4,17 @@
 [![Build Status](https://travis-ci.com/michelwilson/homieclient.svg?branch=master)](https://travis-ci.com/michelwilson/homieclient)
 [![codecov](https://codecov.io/gh/michelwilson/homieclient/branch/master/graph/badge.svg?token=CNP1YTJ3KZ)](https://codecov.io/gh/michelwilson/homieclient)
 
-This is a very basic implementation of a client for IoT devices following the
+
+This is an implementation of a client for IoT devices following the
 [Homie](https://homieiot.github.io/) MQTT convention. Currently, it only
 really supports sensor-like devices, i.e., those devices that publish retained
-non-settable properties, as this is at this point in time the only use-case
-I personally have for it.
+non-settable properties. It is based on [https://github.com/michelwilson/homieclient] 
+but intends to extend it by adding :
+
+* Support for URL based MQTT configuration (instead of IP / Port, to allow support for websockets for instance)
+* Support for RxPy events (instead of plain callbacks, to support async and reactive operators)
+
+⚠ This is currently a work in progress - DO NOT USE
 
 ### Usage
 
