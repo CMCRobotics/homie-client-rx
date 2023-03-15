@@ -1,6 +1,3 @@
-from .device import Device
-from .node import Node
-
 import enum
 
 @enum.unique
@@ -18,43 +15,43 @@ class EventType(enum.Enum):
 
 EVENTS_DEVICE = [EventType.DEVICE_DISCOVERED,EventType.DEVICE_UPDATED]
 EVENTS_NODE = [EventType.NODE_DISCOVERED, EventType.NODE_UPDATED]
-EVENTS_PROPERTY = [EventType.PROPERTY_DISCOVERED, EventType.PROPERTY_UPDATEDs]
+EVENTS_PROPERTY = [EventType.PROPERTY_DISCOVERED, EventType.PROPERTY_UPDATED]
 
 
 class Event:
     """Represents a Homie event.
     Events are propagated asynchronously and can be processed with reactive operators.
     """
-    def __init__(self, event_type:EventType, device: Device =None, node: Node=None, attribute: str = None, property: str=None, value_update = None) -> None:
+    def __init__(self, event_type:EventType, device=None, node=None, homie_attr: str = None, homie_property: str=None, updated_value = None) -> None:
         self.__event_type = event_type
         self.__device = device
         self.__node = node
-        self.__attribute = attribute
-        self.__property = property
-        self.__value_update = value_update
+        self.__homie_attr = homie_attr
+        self.__homie_property = homie_property
+        self.__updated_value = updated_value
 
     @property
     def event_type(self) -> EventType:
         return self.__event_type
 
     @property
-    def device(self) -> Device:
+    def device(self):
         return self.__device
 
     @property
-    def node(self) -> Node:
+    def node(self):
         return self.__node
     
     @property
-    def property(self) -> str:
-        return self.__property
+    def homie_property(self) -> str:
+        return self.__homie_property
     
     @property
-    def attribute(self) -> str:
-        return self.__attribute
+    def homie_attr(self) -> str:
+        return self.__homie_attr
     
     @property
-    def value_update(self):
-        return self.__value_update
+    def updated_value(self):
+        return self.__updated_value
     
     

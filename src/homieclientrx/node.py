@@ -54,7 +54,7 @@ class Node:
             self.attributes[topic] = payload
 
             if not self._initializing:
-                self.homie_client.emit(Event(EventType.NODE_UPDATED, device=self.device, node=self, attribute=topic, updated_value = payload))
+                self._homie_client.emit(EventType.NODE_UPDATED, device=self.device, node=self, homie_attribute=topic, updated_value = payload)
         elif '/' in topic:
             (property, topic) = topic.split('/', 1)
 
@@ -84,7 +84,7 @@ class Node:
             self._complete_properties[property] = data
             del self._incomplete_properties[property]
 
-            self.homie_client.emit(Event(EventType.PROPERTY_DISCOVERED, device=self.device, node=self, property=property))
+            self._homie_client.emit(EventType.PROPERTY_DISCOVERED, device=self.device, node=self, homie_property=property)
 
             if property in self._property_values:
                 self._property_updated(property)
@@ -95,9 +95,8 @@ class Node:
         If the device is ready, calls the property update callback. This
         avoids property updates being sent when the device is offline.
         """
-        with self._homie_client._callback_mutex:
-            if self.device.is_ready():
-                self.homie_client.emit(Event(EventType.PROPERTY_UPDATED, device=self.device, node=self, property=self._get_property(property)))
+        if self.device.is_ready():
+            self._homie_client.emit(EventType.PROPERTY_UPDATED, device=self.device, node=self, homie_property=property, updated_value=self._get_property(property))
 
     def _get_property(self, property):
         """Format the value of the property as a dict.

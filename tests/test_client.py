@@ -63,7 +63,8 @@ def test_out_of_order():
 
 
 def get_client_with_messages(msgs: dict) -> HomieClientRx:
-    c = HomieClientRx()
+    mqtt_client = Mock()
+    c = HomieClientRx(mqtt_client)
 
     for topic, payload in msgs.items():
         msg = MQTTMessage()

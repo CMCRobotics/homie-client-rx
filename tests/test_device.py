@@ -1,8 +1,8 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock,ANY, call
 
-from homieclient import Device
-
+from homieclientrx.device import Device
+from homieclientrx.event import EventType
 
 def test_ready_no_nodes():
     d = get_device_after_msgs('test-device', {
@@ -126,7 +126,11 @@ def test_node_discovery_callback():
         'sensor/$properties': ''
     })
 
-    d._homie_client.on_node_discovered.assert_called_with(d.sensor)
+    expected_calls=[
+                call.emit(EventType.DEVICE_UPDATED, device=d, homie_attr=ANY, updated_value=ANY)
+                ,call.emit(EventType.NODE_DISCOVERED, device=d, node=d.sensor)
+                    ]
+    d._homie_client.assert_has_calls(expected_calls)
 
 
 def get_device_after_msgs(id: str, msgs: dict) -> Device:

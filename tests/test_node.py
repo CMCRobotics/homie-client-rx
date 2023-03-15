@@ -1,8 +1,8 @@
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, MagicMock, ANY
 
-from homieclient.node import Node
-
+from homieclientrx.node import Node
+from homieclientrx.event import EventType
 
 def test_properties_exist():
     n = get_node_with_properties('test-node', {
@@ -38,14 +38,11 @@ def test_callback_on_update():
     n = get_node_with_properties('test-node', {
         'prop1': {'name': 'Property 1', 'datatype': 'integer'}
     })
-
     n.on_message('prop1', 1234)
-
-    n._homie_client.on_property_updated.assert_called_with(n, 'prop1', {
-        'name': 'Property 1',
-        'unit': None,
-        'value': 1234
-    })
+    n._homie_client.emit.assert_called_with(
+        EventType.PROPERTY_UPDATED
+        ,node=n,device=ANY,homie_property='prop1'
+        , updated_value={'name': 'Property 1', 'value': 1234, 'unit': None})
 
 
 def test_no_callback_when_not_ready():
@@ -83,12 +80,11 @@ def test_callback_on_out_of_order_init():
     n.on_message('prop1', '123')
     n.on_message('prop1/$name', 'Property 1')
     n.on_message('prop1/$datatype', 'integer')
-
-    n._homie_client.on_property_updated.assert_called_with(n, 'prop1', {
-        'name': 'Property 1',
-        'value': 123,
-        'unit': None
-    })
+    
+    n._homie_client.emit.assert_called_with(
+        EventType.PROPERTY_UPDATED
+        ,node=n,device=ANY,homie_property='prop1'
+        , updated_value={'name': 'Property 1', 'value': 123, 'unit': None})
 
 
 

@@ -5,6 +5,8 @@ from rx3 import Observable
 from .device import Device
 from .event import Event, EventType
 
+from typing import List
+
 
 class HomieClientRx:
     """
@@ -34,7 +36,7 @@ class HomieClientRx:
         self.client.on_message = self.on_message
         self._complete_devices = {}
         self._incomplete_devices = {}
-        self._observables = []
+        self._observables:List[Observable] = []
 
     def __getattr__(self, name):
         """Get a device based on its id."""
@@ -90,9 +92,10 @@ class HomieClientRx:
             self._incomplete_devices[device][device_topic] = payload
             self.check_incomplete_device(device)
 
-    def emit(self, event: Event) -> None:
-        for obs in self.homie_client._observables:
-            obs.next(event)
+    def emit(self, event_type:EventType, device=None, node=None, homie_attr: str = None, homie_property: str=None, updated_value = None) -> None:
+        evt = Event(event_type, device=device, node=node,homie_attr=homie_attr, homie_property=homie_property, updated_value=updated_value)
+        for obs in self._observables:
+            obs.on_next(evt)
 
 
     def check_incomplete_device(self, device_name):
@@ -121,5 +124,5 @@ class HomieClientRx:
 
             device._initializing = False
 
-            self.emit(Event(EventType.DEVICE_DISCOVERED, device=device))
+            self.emit(EventType.DEVICE_DISCOVERED, device=device)
 

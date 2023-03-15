@@ -1,5 +1,5 @@
 from .node import Node
-from .event import Event, EventType
+from .event import EventType
 
 class Device:
     """Represents a Homie device and contains its nodes.
@@ -56,7 +56,7 @@ class Device:
             self.attributes[topic] = payload
 
             if not len(self._incomplete_nodes):
-                self.homie_client.emit(Event(EventType.DEVICE_UPDATED, device=self, attribute=topic, updated_value = payload))
+                self._homie_client.emit(EventType.DEVICE_UPDATED, device=self, homie_attr=topic, updated_value = payload)
         else:
             (node, node_topic) = topic.split('/', 1)
 
@@ -89,6 +89,7 @@ class Device:
 
             for topic, payload in data.items():
                 node.on_message(topic, payload)
-                self.homie_client.emit(Event(EventType.NODE_DISCOVERED, device=self, node=node))
+            
+            self._homie_client.emit(EventType.NODE_DISCOVERED, device=self, node=node)
 
             del self._incomplete_nodes[node_name]
