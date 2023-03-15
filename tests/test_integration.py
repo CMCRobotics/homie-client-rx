@@ -13,7 +13,6 @@ import rx3.operators as ops
 class TestIntegration(unittest.TestCase):
     def test_integration(self):
         mqtt = Client()
-        mqtt.connect("localhost", 1883)
         c = HomieClientRx(mqtt)
 
         device_discovered_mock = Mock()
