@@ -1,6 +1,6 @@
 # Python Homie client
 
-[![PyPI version](https://badge.fury.io/py/homie-client-rx.svg)](https://badge.fury.io/py/homie-client-rx)
+[![PyPI version](https://badge.fury.io/py/homie-client-rx.svg)](https://badge.fury.io/py/homie-client-rx)[![Python package](https://github.com/CMCRobotics/homie-client-rx/actions/workflows/python-package.yml/badge.svg)](https://github.com/CMCRobotics/homie-client-rx/actions/workflows/python-package.yml)
 
 This is an implementation of a client for IoT devices following the
 [Homie](https://homieiot.github.io/) MQTT convention. Currently, it only
