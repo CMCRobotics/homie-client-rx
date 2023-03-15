@@ -1,9 +1,6 @@
 # Python Homie client
 
-[![PyPI version](https://badge.fury.io/py/homieclient.svg)](https://badge.fury.io/py/homieclient)
-[![Build Status](https://travis-ci.com/michelwilson/homieclient.svg?branch=master)](https://travis-ci.com/michelwilson/homieclient)
-[![codecov](https://codecov.io/gh/michelwilson/homieclient/branch/master/graph/badge.svg?token=CNP1YTJ3KZ)](https://codecov.io/gh/michelwilson/homieclient)
-
+[![PyPI version](https://badge.fury.io/py/homie-client-rx.svg)](https://badge.fury.io/py/homie-client-rx)
 
 This is an implementation of a client for IoT devices following the
 [Homie](https://homieiot.github.io/) MQTT convention. Currently, it only
@@ -14,61 +11,53 @@ but intends to extend it by adding :
 * Support for URL based MQTT configuration (instead of IP / Port, to allow support for websockets for instance)
 * Support for RxPy events (instead of plain callbacks, to support async and reactive operators)
 
-⚠ This is currently a work in progress - DO NOT USE
-
 ### Usage
 
-Create an instance of the client, and connect it to your MQTT server:
+Create an instance of the client, register observables, and connect it to your MQTT server:
 
-```
-from homieclient import HomieClient
+```python
+from homieclientrx.client import HomieClientRx
+from homieclientrx.event import Event, EventType, EVENTS_PROPERTY
 
-c = HomieClient(server='10.42.0.1')
-```
+mqtt = paho.mqtt.client.Client()
+c = HomieClientRx(mqtt)
+subj = Subject()
+# You can use your favorite reactive operator to triage, filter and debounce Homie events
+subj.pipe(ops.filter(lambda evt: evt.event_type == EventType.DEVICE_DISCOVERED)) \
+        .subscribe(on_next=lambda evt: print(f"Device discovered, name: {evt.device.name} type: {evt.device.name}"))
 
-Various callbacks can be registered, that will be called when a device, a node
-or a property is discovered or updated:
+subj.pipe(ops.filter(lambda evt: evt.event_type in EVENTS_PROPERTY)) \
+        .subscribe(on_next=lambda evt: print(f"Property updated, name: {evt.homie_property.name} new value : {evt.updated_value}"))
 
-```
-# Called when a new device is found. Note that at this point not all the nodes
-# of the devices might be discovered yet.
-def device_discovered(device):
-    print("Found device %s, state is %s" % (device.name, device.state))
-c.on_device_discovered = device_discovered
+# Register the reactive observable to start receiving events
+c.register_observable(subj)  
 
-# Called when an attribute on the device changes, such as $state
-def device_updated(device, attribute, value):
-    print('Device %s updated: %s = %s' % (device.name, attribute, value))
-c.on_device_updated = device_updated
+# Likewise, you can unregister observables if you wish to stop receiving messages
+c.unregister_observable(subj)
 
-# Called when a node on a device is found. The device for this node can be
-# accessed via node.device.
-def node_discovered(node):
-    print('Found node %s on device %s' % (node.name, node.device.name))
-    print('Node properties: %s' % node.properties)
-c.on_node_discovered = node_discovered
+# Do not forget to activate the MQTT connection, or messages will not flow !
+mqtt.connect("localhost", 1883)
 
-# Called when an attribute on a node changes.
-def node_updated(node, attribute, value):
-    print('%s, node %s: %s = %s' % (node.device.name, node.name, attribute, value))
-c.on_node_updated = node_updated
+# Receive property updates (...)
 
-# Called when a new property on a node is found.
-def property_discovered(node, property):
-    print('Found property %s on node %s, device %s' % (property, node.name, node.device.name))
-c.on_property_discovered = property_discovered
+# If you need to update a property, send an MQTT message on the desired topic (Homie won't help you there ;-) )
+mqtt.publish("homie/mydevice/mynode/myproperty","my new value")
 
-# Called when a property on a node is updated. The value is a dict
-# containing the name, value and unit of the property
-def property_updated(node, property, value):
-    print('%s: %s = %s' % (node.name, property, repr(value)))
-c.on_property_updated = property_updated
+# When you are done, do not forget to disconnect your MQTT client
+mqtt.disconnect()
+
+# Following the similar philosophy, you are in charge of handling MQTT disconnections, reconnections
+#  for instance, by using retry decorators.
 ```
 
-After registering the callbacks you need to connect the client to the broker:
-```
-c.connect()
-```
+The following event types are supported :
+
+* DEVICE_DISCOVERED : A previously unknown Homie device has been found in the device hierarchy.
+* DEVICE_UPDATED : A known Homie device had one of its attributes updated (find the name of the attribute in the event's ```homie_attr``` property)
+* NODE_DISCOVERED : A previously unknown node has been found on a known device.
+* NODE_UPDATED :  A known node had one of its attributes updated (find the name of the attribute in the event's ```homie_attr``` property)
+* PROPERTY_DISCOVERED : A previously unknown property has been found on a known node.
+* PROPERTY_UPDATED : The property value has changed (find the name of the attribute in the event's ```homie_property``` property)
 
 It is also possible to access all the devices, nodes and properties via the
 client, without using any of the callbacks. Every device is exposed as a property
