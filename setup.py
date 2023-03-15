@@ -18,7 +18,7 @@ setup(
         'paho-mqtt==1.6.1',
         'RxPy3==1.0.2'
     ],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'callee'],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
