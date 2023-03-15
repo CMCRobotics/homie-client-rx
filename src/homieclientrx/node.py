@@ -1,4 +1,4 @@
-from .event import Event,EventType
+from .event import EventType
 
 class Node:
     """Represents a Homie node and contains its properties.
