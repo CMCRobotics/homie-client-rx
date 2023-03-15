@@ -9,7 +9,7 @@ non-settable properties. It is based on [https://github.com/michelwilson/homiecl
 but intends to extend it by adding :
 
 * Support for URL based MQTT configuration (instead of IP / Port, to allow support for websockets for instance)
-* Support for RxPy events (instead of plain callbacks, to support async and reactive operators)
+* Support for [reactive Rx3](https://pypi.org/project/RxPy3/) events (instead of plain callbacks, to support async and reactive operators)
 
 ### Usage
 
