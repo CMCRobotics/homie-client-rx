@@ -94,9 +94,11 @@ class HomieClientRx:
 
     def emit(self, event_type:EventType, device=None, node=None, homie_attr: str = None, homie_property: str=None, updated_value = None) -> None:
         evt = Event(event_type, device=device, node=node,homie_attr=homie_attr, homie_property=homie_property, updated_value=updated_value)
-        for obs in self._observables:
-            obs.on_next(evt)
+        self.emitEvent(evt)
 
+    def emitEvent(self, event:Event):
+        for obs in self._observables:
+            obs.on_next(event)
 
     def check_incomplete_device(self, device_name):
         """Check if the given device is complete.
